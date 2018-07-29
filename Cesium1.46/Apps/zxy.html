@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>wtms!</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+var tms = new Cesium.UrlTemplateImageryProvider({
+    url : 'http://39.107.104.63:8080/tms/1.0.0/world_satellite_raster@EPSG:900913@jpeg/{z}/{x}/{reverseY}.jpeg',
+    maximumLevel : 13
+});
+var viewer = new Cesium.Viewer('cesiumContainer',{
+    imageryProvider:tms,
+    baseLayerPicker: false,
+        animation: false,
+        geocoder: false,
+        homeButton: false,
+        infoBox: false,
+        timeline: false,
+        navigationHelpButton: false,
+        navigationInstructionsInitiallyVisible: false
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>wtms</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+var worldurl='http://39.107.104.63:8080/tms/1.0.0/world_satellite_raster@EPSG:900913@jpeg'; 
+var url='http://39.107.104.63:8080/tms/1.0.0/gujiao_satellite_raster@EPSG:900913@png';
+//var url='http://39.107.104.63:8080/tms/1.0.0/china_dem_tiff@EPSG:900913@tif';
+var viewer = new Cesium.Viewer('cesiumContainer',{
+
+
+baseLayerPicker:false
+
+});
+
+
+
+var imageryLayers = viewer.imageryLayers;
+
+imageryLayers.addImageryProvider(new Cesium.createTileMapServiceImageryProvider({
+url:worldurl}));
+
+imageryLayers.addImageryProvider(new Cesium.createTileMapServiceImageryProvider({
+url : url
+}));
+
+// set lighting to true
+viewer.scene.globe.enableLighting = true;
+
+//add terrain
+function createTerrainProvider(tUrl){
+var terrainProvider=new Cesium.CesiumTerrainProvider({
+        url: tUrl,
+        requestWaterMask : true,
+        requestVertexNormals : true
+    });
+    return terrainProvider;
+}
+
+function addTerrainProvider(terrainProvider){
+viewer.terrainProvider =terrainProvider;
+}
+
+var tUrl='http://localhost:8080/Apps/Dem/testOutputTerrain'; 
+//var tUrl='https://assets.agi.com/stk-terrain/v1/tilesets/world/tiles'; 
+var terrainProvider = createTerrainProvider(tUrl);
+addTerrainProvider(terrainProvider);
+
+function lookAtMtEverest() {
+    var target = new Cesium.Cartesian3(300770.50872389384, 5634912.131394585, 2978152.2865545116);
+    var offset = new Cesium.Cartesian3(6344.974098678562, -793.3419798081741, 2499.9508860763162);
+/*var minLon = 111.68454591398637;
+var maxLon = 112.5209521838217;
+var minLat = 37.5887014309443;
+var maxLat = 38.26417683250406;
+
+var centerLon = (minLon + maxLon )*0.5;
+
+var centerLat = (minLat + maxLat )*0.5;*/
+
+  /*let ellipsoid = viewer.scene.globe.ellipsoid;
+   let target = new Cesium.Cartesian3(0.0,90.0,0.0);
+   target = Cesium.Cartesian3.fromDegrees(centerLon , centerLat , 2978152.2865545116, ellipsoid, result);
+
+   let offset = Cesium.Cartesian3.fromDegrees(centerLon , minLat , 2499.9508860763162, ellipsoid, result);*/
+
+/*var ellipsoid = viewer.scene.globe.ellipsoid;
+var coord_target_wgs84 = Cesium.Cartographic.fromDegrees(centerLon , centerLat , 2978152.2865545116); //单位：度，度，米
+var coord_target_xyz = ellipsoid.cartographicToCartesian(coord_target_wgs84);
+
+var coord_offset_wgs84 = Cesium.Cartographic.fromDegrees(centerLon , minLat , 2499.9508860763162); //单位：度，度，米
+var coord_offset_xyz= ellipsoid.cartographicToCartesian(coord_offset_wgs84);
+
+viewer.camera.lookAt(coord_target_xyz, coord_offset_xyz);*/
+
+viewer.camera.lookAt(target, offset);
+viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+
+}
+
+function flyToRectangle() {
+
+    var west = 111.68454591398637;
+    var south = 37.5887014309443;
+    var east = 112.5209521838217;
+    var north = 38.26417683250406;
+    var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+    viewer.camera.flyTo({
+        destination : rectangle
+    });
+
+    // Show the rectangle.  Not required; just for show.
+    viewer.entities.add({
+        rectangle : {
+            coordinates : rectangle,
+            fill : false,
+            outline : true,
+            outlineColor : Cesium.Color.WHITE
+        }
+    });
+}
+
+function setReferenceFrame() {
+
+var minLon = 111.68454591398637;
+var maxLon = 112.5209521838217;
+var minLat = 37.5887014309443;
+var maxLat = 38.26417683250406;
+
+var centerLon = (minLon + maxLon )*0.5;
+
+var centerLat = (minLat + maxLat )*0.5;
+
+    var center = Cesium.Cartesian3.fromDegrees(centerLon , centerLat );
+    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+
+    // View in east-north-up frame
+    var camera = viewer.camera;
+    camera.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
+    camera.lookAtTransform(transform, new Cesium.Cartesian3(-120000.0, -120000.0, 120000.0));
+
+    // Show reference frame.  Not required.
+   /*var scene = viewer.scene;
+    referenceFramePrimitive = scene.primitives.add(new Cesium.DebugModelMatrixPrimitive({
+       modelMatrix : transform,
+        length : 100000.0
+    }));*/
+
+ var west = 111.68454591398637;
+    var south = 37.5887014309443;
+    var east = 112.5209521838217;
+    var north = 38.26417683250406;
+    var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+    // Show the rectangle.  Not required; just for show.
+    viewer.entities.add({
+        rectangle : {
+            coordinates : rectangle,
+            fill : false,
+            outline : true,
+            outlineColor : Cesium.Color.WHITE
+        }
+    });
+}
+
+//lookAtMtEverest();
+
+//flyToRectangle();
+
+setReferenceFrame();
+
+  </script>
+</body>
+</html>
